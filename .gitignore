@@ -5,6 +5,10 @@
 /node_modules/*
 storage/
 
+Music/*
+!Music/.gitkeep 
+.env
+
 config.json
 database.json
 database.dev.json
