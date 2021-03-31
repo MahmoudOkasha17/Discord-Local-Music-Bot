@@ -1,0 +1,28 @@
+{
+  "name": "Discord-Local-Music-Bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "ffmpeg-static": "^4.2.8",
+    "nodemon": "^2.0.7",
+    "wokcommands": "^1.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MahmoudOkasha17/Discord-Local-Music-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MahmoudOkasha17/Discord-Local-Music-Bot/issues"
+  },
+  "homepage": "https://github.com/MahmoudOkasha17/Discord-Local-Music-Bot#readme"
+}
