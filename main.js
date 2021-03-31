@@ -2,107 +2,15 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const { MessageEmbed } = require('discord.js');
-const WOKCommands = require('wokcommands');
-const { resolve } = require('path');
-const { readdir } = require('fs').promises;
 const fs = require('fs');
 //setup
 const client = new Discord.Client();
 //variables
-//const guildId = '790295430016532550';
-const guildIds = ['790295430016532550', '465017050725875713'];
 const prefix = '-';
 var playlist = [];
 var currentSong = 0;
 var channel = null;
 var vc = null;
-// client.on('ready', () => {
-//   console.log('bot online');
-//   new WOKCommands(client, {
-//     commandsDir: 'commands',
-//     testServers: guildIds,
-//     showWarns: false,
-//   }).setDefaultPrefix(prefix);
-// });
-
-// //get app
-// const getApp = (guildId) => {
-//   const app = client.api.applications(client.user.id);
-//   if (guildId) {
-//     app.guilds(guildId);
-//   }
-//   return app;
-// };
-
-// client.on('ready', async () => {
-//   console.log('bot online');
-//   //list of commands
-//   const commands = await getApp(guildId).commands.get();
-//   console.log(commands);
-//   //adding commands
-//     await getApp(guildId).commands.post({
-//       data: {
-//         name: 'ping',
-//         description: 'A simple ping',
-//       },
-//     });
-//   //deleting commands(get id from console)
-//   //await getApp(guildId).commands('id').delete();
-//   //commands
-//   client.ws.on('INTERACTION_CREATE', async (interaction) => {
-//     const command = interaction.data.name.toLowerCase();
-
-//     if (command === 'ping') {
-//       reply(interaction, 'pong');
-//     }
-//   });
-//   //functions
-//   const reply = (interaction, response) => {
-//     client.api.interactions(interaction.id, interaction.token).callback.post({
-//       data: {
-//         type: 4,
-//         data: {
-//           content: response,
-//         },
-//       },
-//     });
-//   };
-// });
-
-// client.on('ready', async () => {
-//   console.log('bot online');
-//   //list of commands
-//   const commands = await getApp(guildId).commands.get();
-//   console.log(commands);
-//   //adding commands
-//   await getApp(guildId).commands.post({
-//     data: {
-//       name: 'ping',
-//       description: 'A simple ping',
-//     },
-//   });
-//   //deleting commands(get id from console)
-//   await getApp(guildId).commands('id').delete();
-//   //commands
-//   client.ws.on('INTERACTION_CREATE', async (interaction) => {
-//     const command = interaction.data.name.toLowerCase();
-
-//     if (command === 'ping') {
-//       reply(interaction, 'pong');
-//     }
-//   });
-//   //functions
-//   const reply = (interaction, response) => {
-//     client.api.interactions(interaction.id, interaction.token).callback.post({
-//       data: {
-//         type: 4,
-//         data: {
-//           content: response,
-//         },
-//       },
-//     });
-//   };
-// });
 
 client.on('ready', () => {
   console.log('bot online');
