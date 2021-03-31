@@ -113,6 +113,7 @@ client.on('message', (message) => {
   const command = args.shift().toLowerCase();
   if (command === 'play') {
     // Checking if the message author is in a voice channel.
+
     if (!message.member.voice.channel)
       return message.reply('You must be in a voice channel.');
     // Checking if the bot is in a voice channel.
@@ -125,6 +126,7 @@ client.on('message', (message) => {
     if (playlist.length == 0) {
       return message.reply('Playlist Empty');
     }
+
     // Joining the channel and creating a VoiceConnection.
     message.member.voice.channel
       .join()
@@ -137,6 +139,20 @@ client.on('message', (message) => {
         console.log(e);
         VoiceConnection.disconnect();
       });
+  }
+  if (command === 'choose') {
+    //console.log(args);
+    if (args.length >= 1 && !Number.isInteger(parseInt(args[0]))) {
+      return message.reply('Invalid Number.');
+    }
+    if (args.length >= 1) {
+      currentSong = args[0] - 1;
+      if (currentSong < 0 || currentSong >= playlist.length) {
+        return message.reply('Song doesnt belong to playlist.');
+      } else {
+        playSong(vc, message);
+      }
+    }
   }
   if (command === 'next') {
     currentSong = (currentSong + 1) % playlist.length;
@@ -162,13 +178,10 @@ client.on('message', (message) => {
     playlist.forEach((song) => {
       embed.addField(
         `${i + 1} - `,
-        `${playlist[i].match(/([^\/]*)\/*$/)[1].replace('.mp3', '')}`
+        `${playlist[i].match(/([^\/]*)\/*$/)[1].replace('.mp3', '')}.`
       );
       i++;
     });
-    embed.setThumbnail(
-      'https://media.discordapp.net/attachments/818535605826748466/818825911516397589/image0-3.gif'
-    );
     message.reply(embed);
   }
 });
@@ -193,7 +206,7 @@ function playSong(VoiceConnection, message) {
   message.reply(
     `Playing ${playlist[currentSong]
       .match(/([^\/]*)\/*$/)[1]
-      .replace('.mp3', '')}`
+      .replace('.mp3', '')}.`
   );
   VoiceConnection.play(playlist[currentSong]).on('finish', () => {
     currentSong++;
