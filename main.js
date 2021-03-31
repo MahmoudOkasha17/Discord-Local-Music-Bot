@@ -11,6 +11,7 @@ var playlist = [];
 var currentSong = 0;
 var channel = null;
 var vc = null;
+var loop = false;
 
 client.on('ready', () => {
   console.log('bot online');
@@ -68,10 +69,14 @@ client.on('message', (message) => {
     //console.log(playlist);
   }
   if (command === 'prev') {
-    if (currentsong - 1 < 0) {
-      currentsong = playlist.length - 1;
+    if (currentSong - 1 < 0) {
+      currentSong = playlist.length - 1;
     }
     playSong(vc, message);
+  }
+  if (command === 'loop') {
+    loop = !loop;
+    message.reply(`loop is ${loop}`);
   }
   if (command === 'leave') {
     //message.member.voice.channel.leave();
@@ -111,6 +116,7 @@ function getFiles(dir) {
   return results;
 }
 function playSong(VoiceConnection, message) {
+  currentSong = currentSong % playlist.length;
   message.reply(
     `Playing ${playlist[currentSong]
       .match(/([^\/]*)\/*$/)[1]
@@ -118,7 +124,7 @@ function playSong(VoiceConnection, message) {
   );
   VoiceConnection.play(playlist[currentSong]).on('finish', () => {
     currentSong++;
-    if (currentSong < playlist.length) {
+    if (currentSong < playlist.length || loop) {
       playSong(VoiceConnection, message);
     } else {
       currentSong = 0;
