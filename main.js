@@ -1,6 +1,7 @@
 //imports
 require('dotenv').config();
 const Discord = require('discord.js');
+const fetch = require('node-fetch');
 const { MessageEmbed } = require('discord.js');
 const fs = require('fs');
 //setup
@@ -97,8 +98,23 @@ client.on('message', (message) => {
     });
     message.reply(embed);
   }
+  if (command === 'meme') {
+    getMeme(message);
+  }
 });
 //functions
+async function getMeme(message) {
+  fetch('https://meme-api.herokuapp.com/gimme')
+    .then((res) => res.json())
+    .then(async (json) => {
+      let msg = await message.channel.send('Fetching you a juicy meme!');
+      const embed = new MessageEmbed()
+        .setTitle(json.title)
+        .setImage(json.url)
+        .setFooter(`Link: ${json.postLink} | Subreddit: ${json.subreddit}`);
+      msg.edit(embed);
+    });
+}
 function getFiles(dir) {
   var results = [];
   var list = fs.readdirSync(dir);
