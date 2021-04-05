@@ -184,18 +184,22 @@ async function getMetaData(dir, message) {
   try {
     const metadata = await mm.parseFile(dir);
     //console.log(util.inspect(metadata, { showHidden: false, depth: null }));
-
     const embed = new MessageEmbed().setColor('#0099ff');
     //console.log(metadata.common);
+    var enouph = false;
     //setting attachments(cant figure out a better way)
-    fs.writeFileSync('./cover.png', metadata.common.picture[0].data);
-    embed.attachFiles(['./cover.png']);
+    if (metadata.common.picture) {
+      fs.writeFileSync('./cover.png', metadata.common.picture[0].data);
+      embed.attachFiles(['./cover.png']);
+    }
     //title
     if (metadata.common.title) {
+      enouph = true;
       embed.setTitle(`Song Title : ${metadata.common.title}`);
     }
     //Auther
     if (metadata.common.artist && metadata.common.picture) {
+      enouph = true;
       //console.log(metadata.common.artist.replace(/ *\([^)]*\) */g, ''));
       embed.setAuthor(
         metadata.common.artist,
@@ -207,17 +211,21 @@ async function getMetaData(dir, message) {
     }
     //album
     if (metadata.common.album) {
+      enouph = true;
       embed.addField('Album', metadata.common.album, true);
     }
     //albumartist
     if (metadata.common.albumartist) {
+      enouph = true;
       embed.addField('Album Artist', metadata.common.albumartist, true);
     }
     //artist
     if (metadata.common.artist && metadata.common.artists.length <= 1) {
+      enouph = true;
       embed.addField('Artist', metadata.common.artist);
     }
     if (metadata.common.artists && metadata.common.artists.length > 1) {
+      enouph = true;
       var temp = '';
       for (var i = 0; i < metadata.common.artists.length; i++) {
         temp += metadata.common.artists[i] + ' ';
@@ -226,6 +234,7 @@ async function getMetaData(dir, message) {
     }
     //genre
     if (metadata.common.genre) {
+      enouph = true;
       var temp = '';
       for (var i = 0; i < metadata.common.genre.length; i++) {
         temp += metadata.common.genre[i] + ' ';
@@ -238,11 +247,13 @@ async function getMetaData(dir, message) {
     }
     //picture
     if (metadata.common.picture) {
+      enouph = true;
       //thumbnail
       embed.setThumbnail('attachment://cover.png');
     }
     //composer
     if (metadata.common.composer) {
+      enouph = true;
       var temp = '';
       for (var i = 0; i < metadata.common.composer.length; i++) {
         temp += metadata.common.composer[i] + ' ';
@@ -255,9 +266,14 @@ async function getMetaData(dir, message) {
     }
     //footer (releasedate)
     if (metadata.common.year) {
-      embed.setFooter(metadata.common.year);
+      enouph = true;
+      embed.setFooter(`Release${metadata.common.year}`);
     }
-    message.reply(embed);
+    if (enouph) {
+      message.reply(embed);
+    } else {
+      message.reply('Song has no metadata');
+    }
   } catch (error) {
     console.error(error.message);
     message.reply('Song has no metadata');
