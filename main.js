@@ -196,7 +196,7 @@ async function getMetaData(dir, message) {
     }
     //Auther
     if (metadata.common.artist && metadata.common.picture) {
-      console.log(metadata.common.artist.replace(/ *\([^)]*\) */g, ''));
+      //console.log(metadata.common.artist.replace(/ *\([^)]*\) */g, ''));
       embed.setAuthor(
         metadata.common.artist,
         'attachment://cover.png',
