@@ -195,12 +195,16 @@ async function getMetaData(dir, message) {
       embed.setTitle(`Song Title : ${metadata.common.title}`);
     }
     //Auther
-    if (metadata.common.artist && metadata.common.picture)
+    if (metadata.common.artist && metadata.common.picture) {
+      console.log(metadata.common.artist.replace(/ *\([^)]*\) */g, ''));
       embed.setAuthor(
         metadata.common.artist,
         'attachment://cover.png',
-        `https://en.wikipedia.org/wiki/${metadata.common.artist}`
+        `https://en.wikipedia.org/wiki/${metadata.common.artist
+          .replace(/ *\([^)]*\) */g, '')
+          .replace(' ', '_')}`
       );
+    }
     //album
     if (metadata.common.album) {
       embed.addField('Album', metadata.common.album, true);
