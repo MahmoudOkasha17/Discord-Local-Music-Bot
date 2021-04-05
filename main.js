@@ -187,11 +187,20 @@ async function getMetaData(dir, message) {
 
     const embed = new MessageEmbed().setColor('#0099ff');
     //console.log(metadata.common);
-
+    //setting attachments(cant figure out a better way)
+    fs.writeFileSync('./cover.png', metadata.common.picture[0].data);
+    embed.attachFiles(['./cover.png']);
     //title
     if (metadata.common.title) {
-      embed.setTitle(metadata.common.title);
+      embed.setTitle(`Song Title : ${metadata.common.title}`);
     }
+    //Auther
+    if (metadata.common.artist && metadata.common.picture)
+      embed.setAuthor(
+        metadata.common.artist,
+        'attachment://cover.png',
+        `https://en.wikipedia.org/wiki/${metadata.common.artist}`
+      );
     //album
     if (metadata.common.album) {
       embed.addField('Album', metadata.common.album, true);
@@ -225,9 +234,6 @@ async function getMetaData(dir, message) {
     }
     //picture
     if (metadata.common.picture) {
-      //setting attachments(cant figure out a better way)
-      fs.writeFileSync('./cover.png', metadata.common.picture[0].data);
-      embed.attachFiles(['./cover.png']);
       //thumbnail
       embed.setThumbnail('attachment://cover.png');
     }
