@@ -54,10 +54,31 @@ client.on('message', (message) => {
   }
   if (command === 'choose') {
     //console.log(args);
+    //text
     if (args.length >= 1 && !Number.isInteger(parseInt(args[0]))) {
-      return message.reply('Invalid Number.');
+      var found = false;
+      for (var i = 0; i < playlist.length; i++) {
+        if (
+          playlist[i]
+            .match(/([^\/]*)\/*$/)[1]
+            .replace('.mp3', '')
+            .toLowerCase()
+            .includes(args[0])
+        ) {
+          currentSong = i;
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        playSong(vc, message);
+        return message.reply('Found');
+      } else {
+        return message.reply('Not Found');
+      }
     }
-    if (args.length >= 1) {
+    //number
+    else if (args.length >= 1) {
       currentSong = args[0] - 1;
       if (currentSong < 0 || currentSong >= playlist.length) {
         return message.reply('Song doesnt belong to playlist.');
