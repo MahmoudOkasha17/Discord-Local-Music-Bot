@@ -4,6 +4,8 @@ const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const { MessageEmbed } = require('discord.js');
 const fs = require('fs');
+const mm = require('music-metadata');
+const util = require('util');
 //setup
 const client = new Discord.Client();
 
@@ -169,8 +171,88 @@ client.on('message', (message) => {
       message.reply('Playlist Empty');
     }
   }
+  if (command === 'meta') {
+    if (vcCurrent) {
+      getMetaData(playlist[currentSong], message);
+    } else {
+      message.reply('Nothing is Playing.');
+    }
+  }
 });
 //functions
+async function getMetaData(dir, message) {
+  try {
+    const metadata = await mm.parseFile(dir);
+    //console.log(util.inspect(metadata, { showHidden: false, depth: null }));
+
+    const embed = new MessageEmbed().setColor('#0099ff');
+    //console.log(metadata.common);
+
+    //title
+    if (metadata.common.title) {
+      embed.setTitle(metadata.common.title);
+    }
+    //album
+    if (metadata.common.album) {
+      embed.addField('Album', metadata.common.album, true);
+    }
+    //albumartist
+    if (metadata.common.albumartist) {
+      embed.addField('Album Artist', metadata.common.albumartist, true);
+    }
+    //artist
+    if (metadata.common.artist && metadata.common.artists.length <= 1) {
+      embed.addField('Artist', metadata.common.artist);
+    }
+    if (metadata.common.artists && metadata.common.artists.length > 1) {
+      var temp = '';
+      for (var i = 0; i < metadata.common.artists.length; i++) {
+        temp += metadata.common.artists[i] + ' ';
+      }
+      embed.addField('Artists', temp);
+    }
+    //genre
+    if (metadata.common.genre) {
+      var temp = '';
+      for (var i = 0; i < metadata.common.genre.length; i++) {
+        temp += metadata.common.genre[i] + ' ';
+      }
+      if (metadata.common.genre.length > 1) {
+        embed.addField('Genres', temp);
+      } else {
+        embed.addField('Genre', temp);
+      }
+    }
+    //picture
+    if (metadata.common.picture) {
+      //setting attachments(cant figure out a better way)
+      fs.writeFileSync('./cover.png', metadata.common.picture[0].data);
+      embed.attachFiles(['./cover.png']);
+      //thumbnail
+      embed.setThumbnail('attachment://cover.png');
+    }
+    //composer
+    if (metadata.common.composer) {
+      var temp = '';
+      for (var i = 0; i < metadata.common.composer.length; i++) {
+        temp += metadata.common.composer[i] + ' ';
+      }
+      if (metadata.common.composer.length > 1) {
+        embed.addField('Composers', temp);
+      } else {
+        embed.addField('Composer', temp);
+      }
+    }
+    //footer (releasedate)
+    if (metadata.common.year) {
+      embed.setFooter(metadata.common.year);
+    }
+    message.reply(embed);
+  } catch (error) {
+    console.error(error.message);
+    message.reply('Song has no metadata');
+  }
+}
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

@@ -8,6 +8,7 @@ storage/
 Music/*
 !Music/.gitkeep 
 .env
+cover.png
 
 config.json
 database.json
