@@ -10,8 +10,10 @@ const util = require('util');
 const client = new Discord.Client();
 
 //variables
-const prefix = '-';
+const prefix = '=';
 var playlist = [];
+var playlists = [];
+var playliststitles = [];
 var currentSong = 0;
 var channel = null;
 var vc = null;
@@ -36,8 +38,16 @@ client.on('message', (message) => {
       return message.reply("I'm already playing.");
 
     channel = message.member.voice.channel;
-    playlist = getFiles('./Music');
-    playlist = playlist.filter((song) => !song.includes('.gitkeep'));
+    if (playlist.length == 0) {
+      playlist = getFiles('./Music');
+      playlist = playlist.filter((song) => !song.includes('.gitkeep'));
+      for (var i = 0; i < playlists.length; i++) {
+        playlists[i] = playlists[i].filter(
+          (song) => !song.includes('.gitkeep')
+        );
+      }
+    }
+
     if (playlist.length == 0) {
       return message.reply('Playlist Empty');
     }
@@ -178,6 +188,38 @@ client.on('message', (message) => {
       message.reply('Nothing is Playing.');
     }
   }
+  if (command === 'playlists') {
+    var msg = '';
+    playlist = getFiles('./Music');
+    playlist = playlist.filter((song) => !song.includes('.gitkeep'));
+    for (var i = 0; i < playlists.length; i++) {
+      playlists[i] = playlists[i].filter((song) => !song.includes('.gitkeep'));
+      msg += `${i + 1} - ${playliststitles[i]} \n`;
+    }
+    if (playlist.length == 0) {
+      return message.reply('Playlist is empty.');
+    }
+    message.channel.send(msg);
+  }
+  if (command === 'playlist') {
+    //console.log(playlist);
+    if (playlist.length == 0) {
+      return message.reply('Playlist is empty.');
+    }
+    if (args.length >= 1 && !Number.isInteger(parseInt(args[0]))) {
+      return message.reply('Enter a valid number.');
+    }
+    if (args[0] != undefined) {
+      console.log(args[0]);
+      playlist = playlists[(args[0] - 1) % playlists.length];
+      currentSong = 0;
+      if (vc != null) {
+        playSong(vc, message);
+      }
+    } else {
+      return message.reply('Enter a valid number.');
+    }
+  }
 });
 //functions
 async function getMetaData(dir, message) {
@@ -267,7 +309,7 @@ async function getMetaData(dir, message) {
     //footer (releasedate)
     if (metadata.common.year) {
       enouph = true;
-      embed.setFooter(`Release${metadata.common.year}`);
+      embed.setFooter(`Release : ${metadata.common.year}`);
     }
     if (enouph) {
       message.reply(embed);
@@ -279,6 +321,41 @@ async function getMetaData(dir, message) {
     message.reply('Song has no metadata');
   }
 }
+var isArray =
+  Array.isArray ||
+  function (value) {
+    return {}.toString.call(value) !== '[object Array]';
+  };
+function shuffleTogather() {
+  var arrLength = 0;
+  var argsLength = arguments.length;
+  var rnd, tmp;
+
+  for (var index = 0; index < argsLength; index += 1) {
+    if (!isArray(arguments[index])) {
+      throw new TypeError('Argument is not an array.');
+    }
+
+    if (index === 0) {
+      arrLength = arguments[0].length;
+    }
+
+    if (arrLength !== arguments[index].length) {
+      throw new RangeError('Array lengths do not match.');
+    }
+  }
+
+  while (arrLength) {
+    rnd = Math.floor(Math.random() * arrLength);
+    arrLength -= 1;
+    for (argsIndex = 0; argsIndex < argsLength; argsIndex += 1) {
+      tmp = arguments[argsIndex][arrLength];
+      arguments[argsIndex][arrLength] = arguments[argsIndex][rnd];
+      arguments[argsIndex][rnd] = tmp;
+    }
+  }
+}
+
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -297,16 +374,24 @@ async function getMeme(message) {
       msg.edit(embed);
     });
 }
-function getFiles(dir) {
+function getFiles(dir, depth = 0, playlistindex = 0) {
   var results = [];
   var list = fs.readdirSync(dir);
   list.forEach(function (file) {
+    var temp = file;
     file = dir + '/' + file;
     var stat = fs.statSync(file);
     if (stat && stat.isDirectory()) {
       /* Recurse into a subdirectory */
       //console.log(results);
-      results = results.concat(getFiles(file));
+      if (depth == 0) {
+        playliststitles[playlistindex] = temp;
+        //console.log(playliststitles[playlistindex]);
+        playlists[playlistindex] = getFiles(file, depth + 1, playlistindex + 1);
+        playlistindex = playlistindex + 1;
+        //console.log(depth);
+      }
+      results = results.concat(getFiles(file, depth + 1));
       //console.log(results);
     } else {
       /* Is a file */
@@ -316,6 +401,7 @@ function getFiles(dir) {
   return results;
 }
 function playSong(VoiceConnection, message) {
+  //console.log(playlist);
   currentSong = currentSong % playlist.length;
   message.channel.send(
     `Now Playing ${playlist[currentSong]
